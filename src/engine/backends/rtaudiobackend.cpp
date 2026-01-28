@@ -546,8 +546,7 @@ std::vector<std::unique_ptr<IAudioDevice>> RtAudioBackend::enumerateDevices() co
             }
         }
     } catch (const RtAudioError& e) {
-        std::string errMsg = "Failed to enumerate devices: " + e.getMessage();
-        setError(errMsg);
+        setError(e.getMessage());
     }
 
     return devices;
@@ -667,7 +666,7 @@ void RtAudioBackend::clearError() {
     m_lastError.clear();
 }
 
-void RtAudioBackend::setError(const std::string& error) {
+void RtAudioBackend::setError(const std::string& error) const {
     std::lock_guard<std::mutex> lock(m_errorMutex);
     m_lastError = error;
 }

@@ -82,7 +82,7 @@ private:
     int findDeviceIdByName(const std::string& name, bool isInput) const;
 
     // Error handling
-    void setError(const std::string& error);
+    void setError(const std::string& error) const;
     void checkAndThrowRtAudioError(const std::string& context) const;
 
     // State management
@@ -108,7 +108,7 @@ private:
 
     // Error handling
     mutable std::mutex m_errorMutex;
-    std::string m_lastError;
+    mutable std::string m_lastError;
 
     // Latency measurement
     std::vector<float> m_latencyTestBuffer;
