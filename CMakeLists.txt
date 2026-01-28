@@ -23,6 +23,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Cadence
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        src/engine/common/audioerror.h
+        src/engine/common/audioconfig.h
+        src/engine/common/audiodevice.h
+        src/engine/common/audiobackend.h
+        src/engine/tests/audiobackendtest.h src/engine/tests/audiobackendtest.cpp
+        src/engine/backends/linux/linuxbackend.h src/engine/backends/linux/linuxbackend.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Cadence APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -57,6 +63,7 @@ set_target_properties(Cadence PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+find_package(Catch2 3 REQUIRED)
 
 include(GNUInstallDirs)
 install(TARGETS Cadence

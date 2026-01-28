@@ -5,6 +5,7 @@
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
+
 class Project;
 }
 QT_END_NAMESPACE
