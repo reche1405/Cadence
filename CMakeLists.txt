@@ -29,6 +29,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/engine/common/audiobackend.h
         src/engine/tests/audiobackendtest.h src/engine/tests/audiobackendtest.cpp
         src/engine/backends/linux/linuxbackend.h src/engine/backends/linux/linuxbackend.cpp
+        src/engine/tests/audiodevicetest.h
+        src/engine/backends/rtaudiobackend.h
+        src/engine/devices/rtaudiodevice.h src/engine/devices/rtaudiodevice.cpp
+        src/engine/backends/rtaudiobackend.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Cadence APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -50,6 +54,62 @@ endif()
 
 target_link_libraries(Cadence PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
+
+target_include_directories(Cadence PRIVATE ${RT_AUDIO_INCLUDE_DIRS})
+target_link_libraries(Cadence PRIVATE ${RT_AUDIO_LIBRARIES})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(RT_AUDIO REQUIRED rtaudio)
+
+
+
+# Platform-specific audio driverincludes and libraries
+if(WIN32)
+    target_link_libraries(Cadence PRIVATE dsound winmm)
+    target_compile_definitions(Cadence PRIVATE _WIN32_WINNT=0x0601)
+elseif(APPLE)
+    target_link_libraries(Cadence PRIVATE
+        "-framework CoreAudio"
+        "-framework CoreFoundation"
+    )
+elseif(UNIX AND NOT APPLE)  # Linux
+    target_link_libraries(Cadence PRIVATE
+        asound    # ALSA
+        jack      # JACK
+        pthread   # Threads
+    )
+    if(NOT ANDROID)
+        target_link_libraries(Cadence PRIVATE pulse-simple)
+    endif()
+endif()
+
+
+# Tests
+if(BUILD_TESTS)
+    # Find Catch2
+    find_package(Catch2 3 REQUIRED)
+
+    # Test executable
+    add_executable(AudioBackendTests
+        src/engine/tests/AudioBackendTest.cpp
+        src/engine/tests/AudioDeviceTest.cpp
+    )
+
+    target_link_libraries(AudioBackendTests
+        PRIVATE Cadence Catch2::Catch2WithMain
+    )
+
+    # Add test
+    catch_discover_tests(AudioBackendTests)
+endif()
+
+
+
+
+
+
+
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
@@ -63,7 +123,6 @@ set_target_properties(Cadence PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-find_package(Catch2 3 REQUIRED)
 
 include(GNUInstallDirs)
 install(TARGETS Cadence

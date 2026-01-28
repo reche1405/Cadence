@@ -38,7 +38,7 @@ enum class BackendType {
 
 // Device capabilities
 struct DeviceCapabilities {
-    std::vector<int> supportedSampleRates;
+    std::vector<unsigned int> supportedSampleRates;
     std::vector<int> supportedBufferSizes;
     std::vector<SampleFormat> supportedFormats;
     int maxInputChannels;
